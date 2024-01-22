@@ -13,13 +13,19 @@ use yii\widgets\ActiveForm;
     <?php $form = ActiveForm::begin(); ?>
 
     <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
+    <?php // при редактировании существующей категории нельзя допустить, чтобы
+    // в качестве родителя была выбрана эта же категория или ее потомок
+    $exclude = 0;
+    if (!empty($model->id)) {
+        $exclude = $model->id;
+        $parents = $model::getTree($exclude, true);
+        echo $form->field($model, 'parent_id')->dropDownList($parents);
+    }?>
 
     <?= $form->field($model, 'description')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'parent_id')->textInput() ?>
-
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

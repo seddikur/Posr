@@ -17,9 +17,9 @@ class m240122_195327_seed_category_table extends Migration
             $this->insert(
                 'category',
                 [
-                    'title' => $faker->name,
+                    'title' => $faker->domainWord,
                     'description' => $faker->text(50),
-                    'parent_id' => $faker->numberBetween(1, 20)
+                    'parent_id' => $faker->numberBetween(0, 3)
                 ]
             );
         }

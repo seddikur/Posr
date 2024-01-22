@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\imagine\Image;
 
 /**
  * This is the model class for table "article".
@@ -18,8 +19,14 @@ use Yii;
  */
 class Article extends \yii\db\ActiveRecord
 {
+
     /**
-     * {@inheritdoc}
+     * Вспомогательный атрибут для загрузки изображения
+     */
+    public $upload;
+
+    /**
+     * Возвращает имя таблицы базы данных
      */
     public static function tableName()
     {
@@ -27,7 +34,7 @@ class Article extends \yii\db\ActiveRecord
     }
 
     /**
-     * {@inheritdoc}
+     * Правила валидации полей формы при создании и редактировании категории
      */
     public function rules()
     {
@@ -37,11 +44,13 @@ class Article extends \yii\db\ActiveRecord
             [['author_id'], 'integer'],
             [['title', 'img'], 'string', 'max' => 100],
             [['preview'], 'string', 'max' => 255],
+            // атрибут image проверяем с помощью валидатора image
+            ['img', 'image', 'extensions' => 'png, jpg, gif'],
         ];
     }
 
     /**
-     * {@inheritdoc}
+     * Возвращает имена полей формы для создания и редактирования категории
      */
     public function attributeLabels()
     {
@@ -53,6 +62,47 @@ class Article extends \yii\db\ActiveRecord
             'text' => 'Текст',
             'author_id' => 'id автора',
         ];
+    }
+
+    /**
+     * Загружает файл изображения
+     */
+    public function uploadImage() {
+        if ($this->upload) { // только если был выбран файл для загрузки
+            $name = md5(uniqid(rand(), true)) . '.' . $this->upload->extension;
+            // сохраняем исходное изображение в директории source
+            $source = Yii::getAlias('@webroot/images/article/source/' . $name);
+            if ($this->upload->saveAs($source)) {
+                // выполняем resize, чтобы получить маленькое изображение
+                $thumb = Yii::getAlias('@webroot/images/article/thumb/' . $name);
+                Image::thumbnail($source, 250, 250)->save($thumb, ['quality' => 90]);
+                return $name;
+            }
+        }
+        return false;
+    }
+    /**
+     * Удаляет старое изображение при загрузке нового
+     */
+    public static function removeImage($name) {
+        if (!empty($name)) {
+            $source = Yii::getAlias('@webroot/images/article/source/' . $name);
+            if (is_file($source)) {
+                unlink($source);
+            }
+            $thumb = Yii::getAlias('@webroot/images/article/thumb/' . $name);
+            if (is_file($thumb)) {
+                unlink($thumb);
+            }
+        }
+    }
+
+    /**
+     * Удаляет изображение при удалении статьи
+     */
+    public function afterDelete() {
+        parent::afterDelete();
+        self::removeImage($this->img);
     }
 
     /**

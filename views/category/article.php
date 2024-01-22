@@ -1,43 +1,45 @@
 <?php
 
-use app\models\Author;
+use app\models\Article;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 
 /** @var yii\web\View $this */
-/** @var app\models\search\AuthorSearch $searchModel */
-/** @var yii\data\ActiveDataProvider $dataProvider */
+/** @var app\models\search\ArticleSearch $searchModel */
+/** @var Article $article */
 
-$this->title = 'Авторы';
+$this->title = 'Статьи';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="author-index">
+<div class="article-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Новый', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Добавить', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?= GridView::widget([
-        'dataProvider' => $dataProvider,
+        'dataProvider' => $article,
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
-            'surname',
-            'birth',
-            'biography',
+            'title',
+            'img',
+            'preview',
+            'text:ntext',
+            //'author_id',
             [
                 'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, Author $model, $key, $index, $column) {
+                'urlCreator' => function ($action, Article $model, $key, $index, $column) {
                     return Url::toRoute([$action, 'id' => $model->id]);
-                 }
+                }
             ],
         ],
     ]); ?>

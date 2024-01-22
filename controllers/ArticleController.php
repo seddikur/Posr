@@ -7,11 +7,13 @@ use app\models\search\ArticleSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
- * ArticleController implements the CRUD actions for Article model.
+ * Класс ArticleController реализует CRUD для категорий
  */
-class ArticleController extends Controller
+
+class ArticleController extends BaseController
 {
     /**
      * @inheritDoc
@@ -32,9 +34,7 @@ class ArticleController extends Controller
     }
 
     /**
-     * Lists all Article models.
-     *
-     * @return string
+     * Список всех статей
      */
     public function actionIndex()
     {
@@ -48,7 +48,7 @@ class ArticleController extends Controller
     }
 
     /**
-     * Displays a single Article model.
+     * Просмотр данных существующей категории
      * @param int $id ID
      * @return string
      * @throws NotFoundHttpException if the model cannot be found
@@ -69,17 +69,20 @@ class ArticleController extends Controller
     {
         $model = new Article();
 
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(\Yii::$app->request->post()) && $model->validate()) {
+            // загружаем изображение и выполняем resize исходного изображения
+            $model->upload = UploadedFile::getInstance($model, 'img');
+            if ($name = $model->uploadImage()) { // если изображение было загружено
+                // сохраняем в БД имя файла изображения
+                $model->image = $name;
             }
-        } else {
-            $model->loadDefaultValues();
+            $model->save();
+            return $this->redirect(['view', 'id' => $model->id]);
         }
-
         return $this->render('create', [
             'model' => $model,
         ]);
+
     }
 
     /**

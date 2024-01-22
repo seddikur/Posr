@@ -14,16 +14,28 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'img')->textInput(['maxlength' => true]) ?>
-
     <?= $form->field($model, 'preview')->textInput(['maxlength' => true]) ?>
+
+    <fieldset>
+        <legend>Загрузить изображение</legend>
+        <?= $form->field($model, 'img')->fileInput(); ?>
+        <?php
+        if (!empty($model->img)) {
+            $img = Yii::getAlias('@webroot') . '/images/categories/source/' . $model->img;
+            if (is_file($img)) {
+                $url = Yii::getAlias('@web') . '/images/categories/source/' . $model->img;
+                echo 'Уже загружено ', Html::a('изображение', $url, ['target' => '_blank']);
+            }
+        }
+        ?>
+    </fieldset>
 
     <?= $form->field($model, 'text')->textarea(['rows' => 6]) ?>
 
     <?= $form->field($model, 'author_id')->textInput() ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

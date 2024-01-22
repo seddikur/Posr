@@ -2,16 +2,19 @@
 
 namespace app\controllers;
 
+use app\models\Article;
+use app\models\ArticleCategory;
 use app\models\Category;
 use app\models\search\CategorySearch;
+use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * CategoryController implements the CRUD actions for Category model.
+ * Класс CategoryController реализует CRUD для категорий
  */
-class CategoryController extends Controller
+class CategoryController extends BaseController
 {
     /**
      * @inheritDoc
@@ -32,9 +35,7 @@ class CategoryController extends Controller
     }
 
     /**
-     * Lists all Category models.
-     *
-     * @return string
+     * Список всех категорий каталога
      */
     public function actionIndex()
     {
@@ -44,7 +45,28 @@ class CategoryController extends Controller
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'categories' => Category::getAllCategories()
         ]);
+    }
+
+    /**
+     * Список всех статей категории
+     */
+    public function actionArticle($id) {
+        // получаем массив идентификаторов всех потомков категории,
+        // чтобы запросом выбрать статьи и в дочерних категориях
+        $ids = Category::getAllChildIds($id);
+        $ids[] = $id;
+        $article = new ActiveDataProvider([
+            'query' => ArticleCategory::find()->where(['in', 'category_id', $ids])
+        ]);
+        return $this->render(
+            'article',
+            [
+                'category' => $this->findModel($id),
+                'article' => $article,
+            ]
+        );
     }
 
     /**
