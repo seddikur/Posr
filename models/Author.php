@@ -30,6 +30,7 @@ class Author extends \yii\db\ActiveRecord
         return [
             [['surname', 'birth'], 'required'],
             [['birth'], 'integer'],
+            ['birth', 'date', 'format' => 'yyyy'],
             [['surname'], 'string', 'max' => 100],
             [['biography'], 'string', 'max' => 255],
         ];
@@ -46,5 +47,13 @@ class Author extends \yii\db\ActiveRecord
             'birth' => 'Год рождения',
             'biography' => 'Биография',
         ];
+    }
+
+    /**
+     * Удаляет статью при удалении автора
+     */
+    public function afterDelete() {
+        parent::afterDelete();
+        Article::findOne($this->id)->delete();
     }
 }

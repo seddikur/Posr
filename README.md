@@ -1,3 +1,41 @@
+# Порядок установки проекта
+
+- Клонирование проекта
+`git clone https://github.com/seddikur/Post.git`
+
+- Запуск Docker
+`docker compose up -d`
+
+- Переход в контейнер
+`docker exec -it post-php-1 bash`
+
+- Переход в контейнер
+`docker exec -it post-php-1 bash`
+
+- Запуск обновлений yii2
+  `composer update`
+
+- Настройки БД
+```
+'class' => 'yii\db\Connection',
+'dsn' => 'mysql:host=post-db-1;dbname=dbyii',
+'username' => 'root',
+'password' => 'secret',
+'charset' => 'utf8',``
+```
+
+- Запуск миграций
+  `php yii migrate`
+
+
+
+
+
+
+
+
+----------------------
+
 # Тестовое задания
 
 ## Общее

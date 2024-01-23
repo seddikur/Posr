@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\imagine\Image;
 
 /**
@@ -26,6 +27,12 @@ class Article extends \yii\db\ActiveRecord
     public $upload;
 
     /**
+     *  Вспомогательный атрибут для категорий
+     * @var array
+     */
+    public $categoryArray;
+
+    /**
      * Возвращает имя таблицы базы данных
      */
     public static function tableName()
@@ -44,6 +51,8 @@ class Article extends \yii\db\ActiveRecord
             [['author_id'], 'integer'],
             [['title', 'img'], 'string', 'max' => 100],
             [['preview'], 'string', 'max' => 255],
+            //разрешить атрибуту заполняться во время массовых присвоений
+            [['categoryArray',], 'safe'],
             // атрибут image проверяем с помощью валидатора image
             ['img', 'image', 'extensions' => 'png, jpg, gif'],
         ];
@@ -60,7 +69,7 @@ class Article extends \yii\db\ActiveRecord
             'img' => 'Картинка',
             'preview' => 'Анонс',
             'text' => 'Текст',
-            'author_id' => 'id автора',
+            'author_id' => 'Автор',
         ];
     }
 
@@ -113,5 +122,24 @@ class Article extends \yii\db\ActiveRecord
     public function getArticleCategories()
     {
         return $this->hasMany(ArticleCategory::class, ['article_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[ArticleCategories]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAuthor()
+    {
+        return $this->hasOne(Author::class, ['id' => 'author_id']);
+    }
+
+    /**
+     * Возвращает категории из связаных со статьей
+     */
+    public function getCategories(): array
+    {
+        return ArrayHelper::getColumn(
+            $this->getArticleCategories()->all(), 'category_id');
     }
 }

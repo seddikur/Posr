@@ -20,6 +20,7 @@ class m240122_195346_seed_article_table extends Migration
                     'title' => $faker->name,
                     'preview' => $faker->text(rand(100, 200)),
                     'text' => $faker->text(rand(1000, 2000)),
+                    'author_id' => $faker->numberBetween(1, 20),
 //                    'img' => $faker->fileExtension(),
                     'img' => $faker->filePath(),
                 ]

@@ -3,7 +3,12 @@
 namespace app\controllers;
 
 use app\models\Article;
+use app\models\ArticleCategory;
+use app\models\Author;
+use app\models\Category;
 use app\models\search\ArticleSearch;
+use yii\helpers\ArrayHelper;
+use yii\helpers\VarDumper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -68,6 +73,10 @@ class ArticleController extends BaseController
     public function actionCreate()
     {
         $model = new Article();
+        $array= Author::find()->all();
+        $authors = ArrayHelper::map($array, 'id', 'surname');
+        //показываем какие теги записаны для этой статьи
+        $model->categoryArray = $model->getCategories();
 
         if ($model->load(\Yii::$app->request->post()) && $model->validate()) {
             // загружаем изображение и выполняем resize исходного изображения
@@ -76,11 +85,28 @@ class ArticleController extends BaseController
                 // сохраняем в БД имя файла изображения
                 $model->image = $name;
             }
-            $model->save();
-            return $this->redirect(['view', 'id' => $model->id]);
+            if($model->save()){
+                //запись категории
+                //удаляем сначала все категории по этой статье
+                ArticleCategory::deleteAll(['article_id' => $model->id]);
+                $values = [];
+                //получаем из формы атрибут categoryArray
+                $model->categoryArray;
+                foreach ($model->categoryArray as $id) {
+                    $values[] = [$model->id, $id];
+                }
+                //записываем массив в таблицу
+                \Yii::$app->db->createCommand()->batchInsert(ArticleCategory::tableName(), ['article_id', 'category_id'], $values)->execute();
+                return $this->redirect(['index']);
+            }else{
+                echo \yii\helpers\Json::encode($model->getErrors());
+                die();
+            }
         }
         return $this->render('create', [
             'model' => $model,
+            'authors' => $authors,
+            'category' => Category::find()->all(),
         ]);
 
     }
@@ -95,13 +121,50 @@ class ArticleController extends BaseController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $array= Author::find()->all();
+        $authors = ArrayHelper::map($array, 'id', 'surname');
+        //показываем какие теги записаны для этой статьи
+        $model->categoryArray = $model->getCategories();
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        // старое изображение, которое надо удалить, если загружено новое
+        $old = $model->img;
+        if ($model->load(\Yii::$app->request->post()) && $model->validate()) {
+            // загружаем изображение и выполняем resize исходного изображения
+            $model->upload = UploadedFile::getInstance($model, 'img');
+            if ($new = $model->uploadImage()) { // если изображение было загружено
+                // удаляем старое изображение
+                if (!empty($old)) {
+                    $model::removeImage($old);
+                }
+                // сохраняем в БД новое имя
+                $model->img = $new;
+            } else { // оставляем старое изображение
+                $model->img = $old;
+            }
+
+            if($model->save()){
+                //запись категории
+                //удаляем сначала все категории по этой статье
+                ArticleCategory::deleteAll(['article_id' => $model->id]);
+                $values = [];
+                //получаем из формы атрибут categoryArray
+                $model->categoryArray;
+                foreach ($model->categoryArray as $id) {
+                    $values[] = [$model->id, $id];
+                }
+                //записываем массив в таблицу
+                \Yii::$app->db->createCommand()->batchInsert(ArticleCategory::tableName(), ['article_id', 'category_id'], $values)->execute();
+                return $this->redirect(['index']);
+            }else{
+                echo \yii\helpers\Json::encode($model->getErrors());
+                die();
+            }
         }
 
         return $this->render('update', [
             'model' => $model,
+            'authors' => $authors,
+            'category' => Category::find()->all(),
         ]);
     }
 

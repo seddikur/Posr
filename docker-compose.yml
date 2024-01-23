@@ -53,7 +53,7 @@ services:
     ports:
       - 3300:3306
     volumes:
-      - /Docker/data:/var/lib/mysql #
+      - ./Docker/mysql:/var/lib/mysql #
     environment:
       MYSQL_DATABASE: "${DB_NAME}"
       MYSQL_ROOT_PASSWORD: "${DB_PASSWORD}"

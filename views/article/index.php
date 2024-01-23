@@ -31,9 +31,24 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'id',
             'title',
-            'img',
+            [
+                'value' => function (Article $model) {
+                    return Html::img('/images/article/thumb/'.$model->img, ['width' => 100, 'alt' => $model->img]);
+                },
+                'label' => 'картинка',
+                'format' => 'raw'
+            ],
+            [
+                'label' => 'Автор',
+                'format' => 'html',
+                'value' => function (Article $model) {
+                    return '<span class="text-danger">' . $model->author->surname . '</span>';
+                }
+            ],
             'preview',
-            'text:ntext',
+
+
+//            'text:ntext',
             //'author_id',
             [
                 'class' => ActionColumn::className(),
