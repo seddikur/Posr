@@ -1,6 +1,13 @@
 /.idea
 
-
-
 # composer vendor dir
 /vendor
+
+# Docker dir
+/Docker/mysql
+/Docker/config/nginx/access.log
+/Docker/config/nginx/error.log
+
+# Image
+/web/images/article/source
+/web/images/article/thumb
