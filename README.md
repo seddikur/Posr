@@ -9,9 +9,6 @@
 - Переход в контейнер
 `docker exec -it post-php-1 bash`
 
-- Переход в контейнер
-`docker exec -it post-php-1 bash`
-
 - Запуск обновлений yii2
   `composer update`
 
@@ -27,6 +24,12 @@
 - Запуск миграций
   `php yii migrate`
 
+
+Method
+
+Route
+
+Description
 
 
 
