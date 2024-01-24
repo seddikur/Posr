@@ -1,10 +1,13 @@
 <?php
+namespace app\modules\v1\controllers;
 
-namespace app\controllers;
+use app\models\Article;
+use yii\rest\ActiveController;
 
-class AuthorsController extends \yii\rest\ActiveController
+class ArticleController extends ActiveController
 {
-    public $modelClass = 'app\models\Author';
+
+    public $modelClass = 'app\models\Article';
 
     private function errorResponse($message)
     {
@@ -13,5 +16,7 @@ class AuthorsController extends \yii\rest\ActiveController
 
         return $this->asJson(['error' => $message]);
     }
-}
 
+
+
+}
