@@ -25,12 +25,15 @@
   `php yii migrate`
 
 
-Method
+GET /articles: получение постранично списка всех статей;
 
-Route
+POST /articles: создание новой статьи;
 
-Description
+GET /articles/123: получение информации по статьие с id равным 123;
 
+PATCH /articles/123 и PUT /article/123: изменение информации по статье с id равным 123;
+
+DELETE /articles/123: удаление статьи с id равным 123;
 
 
 

@@ -59,6 +59,31 @@ class Article extends \yii\db\ActiveRecord
     }
 
     /**
+     * пример http://localhost:8080/articles?fields=id,title&expand=author
+     */
+    public function extraFields()
+    {
+        return [
+            'author',
+        ];
+    }
+
+    /**
+     * пример http://localhost:8080/articles?fields=id,title
+     */
+    public function fields()
+    {
+        return [
+            'id',
+            'title',
+            'img',
+            'preview',
+            'text',
+//            'author_id ',
+        ];
+    }
+
+    /**
      * Возвращает имена полей формы для создания и редактирования категории
      */
     public function attributeLabels()
